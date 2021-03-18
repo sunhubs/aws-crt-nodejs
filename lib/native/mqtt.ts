@@ -231,6 +231,7 @@ export class MqttClientConnection extends NativeResourceMixin(BufferedEventEmitt
             reject = this._reject(reject);
 
             const on_connect = (error_code: number, return_code: number, session_present: boolean) => {
+                console.log("error_code" + error_code);
                 if (error_code == 0 && return_code == 0) {
                     resolve(session_present);
                     this.emit('connect', session_present);
