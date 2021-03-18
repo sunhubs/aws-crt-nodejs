@@ -40,12 +40,16 @@ struct mqtt_connection_binding {
 };
 
 static void s_mqtt_client_connection_release_threadsafe_function(struct mqtt_connection_binding *binding) {
-    AWS_NAPI_CALL(
-                  binding->env, aws_napi_release_threadsafe_function(binding->on_connection_interrupted, napi_tsfn_abort), ;);
-    AWS_NAPI_CALL(
-                  binding->env, aws_napi_release_threadsafe_function(binding->on_connection_resumed, napi_tsfn_abort), ;);
-    AWS_NAPI_CALL(binding->env, aws_napi_release_threadsafe_function(binding->on_any_publish, napi_tsfn_abort), ;);
-    AWS_NAPI_CALL(binding->env, aws_napi_release_threadsafe_function(binding->transform_websocket, napi_tsfn_abort), ;);
+    AWS_NAPI_ENSURE(
+        binding->env, aws_napi_release_threadsafe_function(binding->on_connection_interrupted, napi_tsfn_abort));
+    AWS_NAPI_ENSURE(
+        binding->env, aws_napi_release_threadsafe_function(binding->on_connection_resumed, napi_tsfn_abort));
+    AWS_NAPI_ENSURE(binding->env, aws_napi_release_threadsafe_function(binding->on_any_publish, napi_tsfn_abort));
+    AWS_NAPI_ENSURE(binding->env, aws_napi_release_threadsafe_function(binding->transform_websocket, napi_tsfn_abort));
+    binding->on_connection_interrupted = NULL;
+    binding->on_connection_resumed = NULL;
+    binding->on_any_publish = NULL;
+    binding->transform_websocket = NULL;
 }
 
 static void s_mqtt_client_connection_finalize(napi_env env, void *finalize_data, void *finalize_hint) {
