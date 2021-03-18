@@ -463,11 +463,12 @@ static void s_on_connect_call(napi_env env, napi_value on_connect, void *context
         env, aws_napi_dispatch_threadsafe_function(env, args->on_connect, NULL, on_connect, num_params, params));
 
     AWS_NAPI_ENSURE(env, aws_napi_unref_threadsafe_function(env, args->on_connect));
-    aws_mem_release(binding->allocator, args);
+
     if (args->return_code || args->error_code) {
         /* Failed to create a connection, none of the callbacks will be invoked again */
         s_mqtt_client_connection_release_threadsafe_function(binding);
     }
+    aws_mem_release(binding->allocator, args);
 }
 
 static void s_on_connected(
